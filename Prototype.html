@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Teen Privacy Mode - Prototype</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .phone-frame {
+            width: 100%;
+            height: 812px;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 40px 20px;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Screen 1: Age Gate */
+        .age-gate {
+            background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+            justify-content: space-between;
+            padding: 60px 20px;
+        }
+
+        .age-gate h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .age-gate p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .date-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid white;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .date-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Screen 2: Parent Consent Gate */
+        .consent-gate {
+            background: white;
+            justify-content: space-between;
+            padding: 50px 20px;
+        }
+
+        .consent-gate h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .consent-gate p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #f09433;
+            color: white;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #1a1a1a;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:active {
+            background: #e8e8e8;
+        }
+
+        .info-box {
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #f09433;
+        }
+
+        .info-box h3 {
+            font-size: 12px;
+            color: #f09433;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .info-box ul {
+            list-style: none;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .info-box li:before {
+            content: "✓ ";
+            color: #f09433;
+            font-weight: bold;
+            margin-right: 6px;
+        }
+
+        /* Screen 3: Parent Verification */
+        .parent-verify-step {
+            background: white;
+            justify-content: flex-start;
+            padding: 30px 20px;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .verification-method {
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+        }
+
+        .verification-method h3 {
+            font-size: 13px;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .verification-method button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .verification-method button:hover {
+            background: #f0f0f0;
+        }
+
+        .verification-method button:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Screen 4: Parent Data Preferences */
+        .parent-prefs {
+            background: white;
+            justify-content: flex-start;
+            padding: 30px 20px;
+        }
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #d4f4dd;
+            color: #22863a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .verified-badge:before {
+            content: "✓";
+            font-weight: bold;
+        }
+
+        .toggle-section {
+            margin-bottom: 24px;
+        }
+
+        .toggle-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .toggle-label h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 28px;
+            background: #ddd;
+            border-radius: 14px;
+            position: relative;
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toggle-switch.on {
+            background: #f09433;
+        }
+
+        .toggle-dot {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s ease;
+        }
+
+        .toggle-switch.on .toggle-dot {
+            left: 24px;
+        }
+
+        .toggle-description {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 40px;
+        }
+
+        .button-container .btn {
+            flex: 1;
+        }
+
+        /* Screen 5: Success Screen */
+        .success-screen {
+            background: white;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .success-screen h1 {
+            font-size: 24px;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        .success-screen p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .checkmark-list {
+            text-align: left;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .checkmark-list p {
+            font-size: 13px;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkmark-list p:before {
+            content: "✓";
+            color: #22863a;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Screen 6: Parent Dashboard */
+        .parent-dashboard {
+            background: white;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .dash-header {
+            margin-bottom: 24px;
+        }
+
+        .dash-header h1 {
+            font-size: 18px;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .dash-header p {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .stat-box {
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 4px solid #f09433;
+        }
+
+        .stat-box h3 {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .stat-box p {
+            font-size: 16px;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* Screen 7: Teen Feed */
+        .teen-feed {
+            background: white;
+            padding: 12px;
+            overflow-y: auto;
+        }
+
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 0 8px;
+        }
+
+        .feed-header h2 {
+            font-size: 24px;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .settings-icon {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .post-card {
+            margin-bottom: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f9f9f9;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f09433, #e6683c);
+        }
+
+        .post-meta h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .post-meta p {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .post-actions {
+            padding: 12px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .icon-btn {
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .icon-btn:active {
+            transform: scale(1.2);
+        }
+
+        .privacy-banner {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 12px;
+            margin-bottom: 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1565c0;
+            line-height: 1.6;
+        }
+
+        /* Screen 8: Teen Settings */
+        .teen-settings {
+            background: white;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .settings-header {
+            margin-bottom: 30px;
+        }
+
+        .settings-header h1 {
+            font-size: 20px;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .settings-header p {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-section h2 {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .settings-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-item h3 {
+            font-size: 14px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .settings-item p {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+            padding: 8px;
+            transition: color 0.2s;
+            min-width: 50px;
+        }
+
+        .nav-btn.active {
+            color: #f09433;
+        }
+
+        .screen-number {
+            position: absolute;
+            bottom: 70px;
+            right: 20px;
+            font-size: 12px;
+            color: #999;
+            background: #f0f0f0;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .tutorial {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            z-index: 100;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="phone-frame">
+            <!-- Screen 1: Age Gate -->
+            <div class="screen active age-gate">
+                <div class="tutorial">👉 Select a birthdate (choose 2010 to see teen flow)</div>
+                <div>
+                    <h1>👋 Hi!</h1>
+                    <p>When's your birthday?</p>
+                    <input type="date" id="birthdateInput" class="date-input" placeholder="Select date">
+                </div>
+            </div>
+
+            <!-- Screen 2: Consent Gate -->
+            <div class="screen consent-gate">
+                <div class="tutorial">👉 Tap WhatsApp to send consent link to parent</div>
+                <div>
+                    <h1>👋 Hi Aarav!</h1>
+                    <p>Because you're under 18, Indian law requires your parent's approval. This takes 2 minutes and keeps your data safe.</p>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="goToScreen(3)">📱 Send via WhatsApp</button>
+                        <button class="btn btn-secondary">📲 Send via SMS</button>
+                        <button class="btn btn-secondary">📧 Send via Email</button>
+                    </div>
+
+                    <div class="info-box">
+                        <h3>What will my parent see?</h3>
+                        <ul>
+                            <li>Your name and age</li>
+                            <li>What data Instagram collects</li>
+                            <li>How to limit or delete it</li>
+                        </ul>
+                        <p style="margin-top: 10px; font-size: 12px; color: #666;">Your messages stay private</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 3: Parent Verification -->
+            <div class="screen parent-verify-step">
+                <div class="tutorial">👉 Tap "Verify via Aadhaar OTP" to proceed</div>
+                <div class="header">
+                    <h1>Verify Your Identity</h1>
+                    <p>To protect Aarav's account, confirm you're his parent or guardian.</p>
+                </div>
+
+                <div style="margin-top: 30px; margin-bottom: 120px;">
+                    <div class="verification-method">
+                        <h3>📱 Government-Approved ID Verification</h3>
+                        <button onclick="alert('Aadhaar OTP sent to registered number'); goToScreen(4);">Verify via Aadhaar OTP</button>
+                        <button onclick="alert('DigiLocker verification initiated');">Verify via DigiLocker</button>
+                        <button onclick="alert('Email verification link sent');">Verify via Email + Video Selfie</button>
+                    </div>
+
+                    <p style="font-size: 12px; color: #999; text-align: center; margin-top: 20px;">
+                        Your identity will be verified securely. We will not store your sensitive data.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Screen 4: Parent Data Preferences -->
+            <div class="screen parent-prefs">
+                <div class="tutorial">👉 Toggle switches to enable/disable data collection</div>
+                <div class="header">
+                    <h1>Verify & Approve Aarav's Account</h1>
+                    <div class="verified-badge">Aarav's Mother</div>
+                </div>
+
+                <div style="margin-top: 30px; margin-bottom: 100px;">
+                    <h2 style="font-size: 14px; color: #1a1a1a; margin-bottom: 20px; font-weight: 600;">Choose Aarav's Data Settings:</h2>
+
+                    <div class="toggle-section">
+                        <div class="toggle-label" onclick="toggleSwitch(this)">
+                            <div>
+                                <h3>📹 Show recommended videos</h3>
+                                <div class="toggle-description">Based on topics, not tracking</div>
+                            </div>
+                            <div class="toggle-switch on">
+                                <div class="toggle-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="toggle-section">
+                        <div class="toggle-label" onclick="toggleSwitch(this)">
+                            <div>
+                                <h3>📢 Personalized ads</h3>
+                                <div class="toggle-description">Based on behavior — OFF</div>
+                            </div>
+                            <div class="toggle-switch">
+                                <div class="toggle-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="toggle-section">
+                        <div class="toggle-label" onclick="toggleSwitch(this)">
+                            <div>
+                                <h3>📍 Location features</h3>
+                                <div class="toggle-description">Nearby recommendations — OFF</div>
+                            </div>
+                            <div class="toggle-switch">
+                                <div class="toggle-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="toggle-section">
+                        <div class="toggle-label" onclick="toggleSwitch(this)">
+                            <div>
+                                <h3>💬 Friends-only messaging</h3>
+                                <div class="toggle-description">Can message only friends</div>
+                            </div>
+                            <div class="toggle-switch on">
+                                <div class="toggle-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn btn-primary" onclick="goToScreen(5)">Save & Approve</button>
+                    <button class="btn btn-secondary" onclick="goToScreen(2)">Back</button>
+                </div>
+            </div>
+
+            <!-- Screen 5: Success Confirmation -->
+            <div class="screen success-screen">
+                <div class="tutorial">👉 Tap "Continue to Dashboard" to see next steps</div>
+                <div class="success-icon"></div>
+                <h1>Aarav's Account is Ready</h1>
+                <p>Privacy Mode has been enabled. Your preferences have been saved.</p>
+
+                <div class="checkmark-list">
+                    <p>Privacy Mode activated</p>
+                    <p>Preferences saved</p>
+                    <p>Parent controls enabled</p>
+                </div>
+
+                <button class="btn btn-primary" onclick="goToScreen(6)" style="width: 100%;">Continue to Dashboard</button>
+            </div>
+
+            <!-- Screen 6: Parent Dashboard -->
+            <div class="screen parent-dashboard">
+                <div class="tutorial">👉 Scroll down to see download/delete options</div>
+                <div class="dash-header">
+                    <h1>Aarav's Activity</h1>
+                    <p>Privacy Mode Active ✓</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3> Screen Time This Week</h3>
+                    <p>3 hours</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3> Posts Created</h3>
+                    <p>2 posts</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3> Connections</h3>
+                    <p>47 connections</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3> Data Collection</h3>
+                    <p>Minimal (Privacy Mode)</p>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="alert('Download initiated. Check your email.')">📥 Download Aarav\'s Data</button>
+                    <button class="btn btn-secondary" onclick="goToScreen(7)">👁️ View Feed (Teen\'s Perspective)</button>
+                    <button class="btn btn-secondary" onclick="goToScreen(8)">⚙️ Teen\'s Privacy Settings</button>
+                </div>
+            </div>
+
+            <!-- Screen 7: Teen Feed -->
+            <div class="screen teen-feed">
+                <div class="tutorial">👉 Like, comment, tap settings icon (⚙️) to change settings</div>
+                <div class="feed-header">
+                    <h2>Feed</h2>
+                    <div class="settings-icon" onclick="goToScreen(8)">⚙️</div>
+                </div>
+
+                <div class="privacy-banner">
+                    🔒 Privacy Mode is ON. Recommendations use topics, not your activity.
+                </div>
+
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="avatar"></div>
+                        <div class="post-meta">
+                            <h3>TechCreator</h3>
+                            <p>2 hours ago</p>
+                        </div>
+                    </div>
+                    <div class="post-image"></div>
+                    <div class="post-actions">
+                        <div class="icon-btn" onclick="this.innerText = this.innerText === '❤️' ? '🤍' : '❤️'">🤍</div>
+                        <div class="icon-btn">💬</div>
+                        <div class="icon-btn">✈️</div>
+                    </div>
+                </div>
+
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div>
+                        <div class="post-meta">
+                            <h3>DesignDaily</h3>
+                            <p>4 hours ago</p>
+                        </div>
+                    </div>
+                    <div class="post-image" style="background: linear-gradient(135deg, #f093fb, #f5576c);"></div>
+                    <div class="post-actions">
+                        <div class="icon-btn" onclick="this.innerText = this.innerText === '❤️' ? '🤍' : '❤️'">🤍</div>
+                        <div class="icon-btn">💬</div>
+                        <div class="icon-btn">✈️</div>
+                    </div>
+                </div>
+
+                <div style="height: 80px;"></div>
+            </div>
+
+            <!-- Screen 8: Teen Privacy Settings -->
+            <div class="screen teen-settings">
+                <div class="tutorial">👉 Scroll down to see all privacy options</div>
+                <div class="settings-header">
+                    <h1>Privacy Settings</h1>
+                    <p>Control your data and privacy</p>
+                </div>
+
+                <div class="settings-section">
+                    <h2>Your Data</h2>
+                    <div class="settings-item" onclick="alert('Your data will be downloaded to your email.')">
+                        <h3> Download Your Data</h3>
+                        <p>→</p>
+                    </div>
+                    <div class="settings-item" onclick="alert('Request submitted. Your account will be deleted in 30 days.')">
+                        <h3>Delete Your Account</h3>
+                        <p>→</p>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h2>💬 Messages</h2>
+                    <div class="settings-item">
+                        <h3> Who Can Message Me</h3>
+                        <p>Friends Only</p>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h2> Content</h2>
+                    <div class="settings-item">
+                        <h3> Story Visibility</h3>
+                        <p>Friends Only</p>
+                    </div>
+                    <div class="settings-item">
+                        <h3> Location Sharing</h3>
+                        <p>OFF</p>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h2> Parental Control</h2>
+                    <div class="settings-item">
+                        <div>
+                            <h3> Parent Controls</h3>
+                            <p style="margin-top: 8px; font-size: 12px; color: #666; line-height: 1.6;">Your parent can see your activity summary and manage your privacy settings until you turn 18.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="goToScreen(6)" style="margin-top: 30px; width: 100%;">← Back to Parent Dashboard</button>
+            </div>
+
+            <!-- Screen Number Indicator -->
+            <div class="screen-number" id="screenNumber">1/8</div>
+
+            <!-- Navigation Bar -->
+            <div class="nav-bar">
+                <button class="nav-btn active" onclick="goToScreen(1)">1️⃣</button>
+                <button class="nav-btn" onclick="goToScreen(2)">2️⃣</button>
+                <button class="nav-btn" onclick="goToScreen(3)">3️⃣</button>
+                <button class="nav-btn" onclick="goToScreen(4)">4️⃣</button>
+                <button class="nav-btn" onclick="goToScreen(5)">5️⃣</button>
+                <button class="nav-btn" onclick="goToScreen(6)">6️⃣</button>
+                <button class="nav-btn" onclick="goToScreen(7)">7️⃣</button>
+                <button class="nav-btn" onclick="goToScreen(8)">8️⃣</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentScreen = 1;
+
+        function goToScreen(screenNumber) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.querySelectorAll('.screen')[screenNumber - 1].classList.add('active');
+            document.querySelectorAll('.nav-btn')[screenNumber - 1].classList.add('active');
+            
+            document.getElementById('screenNumber').textContent = `${screenNumber}/8`;
+            currentScreen = screenNumber;
+        }
+
+        function toggleSwitch(element) {
+            const switchEl = element.querySelector('.toggle-switch');
+            switchEl.classList.toggle('on');
+        }
+
+        document.getElementById('birthdateInput').addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const today = new Date();
+            const age = today.getFullYear() - selectedDate.getFullYear();
+            
+            if (age < 18) {
+                setTimeout(() => goToScreen(2), 300);
+            } else {
+                alert('You are 18 or older. Standard Instagram experience will apply.');
+            }
+        });
+    </script>
+</body>
+</html>
